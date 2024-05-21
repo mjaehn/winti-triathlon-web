@@ -13,7 +13,11 @@ export default function Home() {
     fetch('/api/data')
       .then(response => response.json())
       .then(data => {
-        setData(data);
+        // Sortiere die Daten nach der Spalte "Rg."
+        const sortedData = data.sort((a: DataRow, b: DataRow) => {
+          return a['Rang'] - b['Rang'];
+        });
+        setData(sortedData);
       })
       .catch(error => {
         console.error('Error fetching data:', error);
@@ -30,16 +34,17 @@ export default function Home() {
 
 function Table({ data }: { data: DataRow[] }) {
   if (data.length === 0) {
-    return <p>Tabelle wird geladen ...</p>;
+    return <p>No data available.</p>;
   }
 
-  const headers = Object.keys(data[0]);
+  // Definiere die Spalten, die du anzeigen möchtest
+  const columnsToDisplay = ['Rang', 'Nachname', 'Vorname', 'EloInt', 'Fed', 'Pkt', 'Wtg1'];
 
   return (
     <table className="table table-striped">
       <thead>
         <tr>
-          {headers.map(header => (
+          {columnsToDisplay.map(header => (
             <th key={header}>{header}</th>
           ))}
         </tr>
@@ -47,7 +52,7 @@ function Table({ data }: { data: DataRow[] }) {
       <tbody>
         {data.map((row, index) => (
           <tr key={index}>
-            {headers.map(header => (
+            {columnsToDisplay.map(header => (
               <td key={header}>{row[header]}</td>
             ))}
           </tr>
